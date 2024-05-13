@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from gym.vector.utils import spaces
+# from gym.vector.utils import spaces
 from gym_anytrading.envs import StocksEnv
 import gymnasium as gym
 import gym_trading_env
@@ -12,7 +12,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.dqn import MlpPolicy
 
 # from agent import Agent
-from rat.test_env import StockTradingEnv
+# from rat.test_env import StockTradingEnv
 import yfinance as yf
 
 class Config:
@@ -63,23 +63,24 @@ def evaluate(model, num_episodes=100):
 def main():
     config = Config()
     models_dir=r"D:\all projects\stock-traiding\models"
-    і=spaces.Box(
-        low=np.array([0, 0]), high=np.array([3, 1]), dtype=np.float16)
+
+
     start="2015-01-01"
     end="2021-01-01"
     # data = yf.download("AAPL",start= start,end=end, interval="1h")
     data = yf.download("AAPL",period="730d", interval="1h")
     print(len(data))
     env = StocksEnv(df=data, window_size=30, frame_bound=(30, len(data)))
-    # data.columns=[i.lower() for i in data.columns]
-    #
-    # env=gym.make("TradingEnv",
-    #          name="Apple",
-    #          df=data,  # Your dataset with your custom features
-    #          positions=[-1, 0, 1],  # -1 (=SHORT), 0(=OUT), +1 (=LONG)
-    #          trading_fees=0.01 / 100,  # 0.01% per stock buy / sell (Binance fees)
-    #          borrow_interest_rate=0.0003 / 100,  # 0.0003% per timestep (one timestep = 1h here)
-    #          )
+    data.columns=[i.lower() for i in data.columns]
+
+    env=gym.make("TradingEnv",
+             name="Apple",
+             df=data,  # Your dataset with your custom features
+             positions=[-1, 0, 1],  # -1 (=SHORT), 0(=OUT), +1 (=LONG)
+             trading_fees=0.18 / 100,  # 0.01% per stock buy / sell (Binance fees)
+             borrow_interest_rate=0.00001 / 100,  # 0.0003% per timestep (one timestep = 1h here)
+             # borrow_interest_rate=0,  # 0.0003% per timestep (one timestep = 1h here)
+             )
     # # env.save_rendering(r"D:\all projects\stock-traiding\render_logs")
     # env = DummyVecEnv([lambda: env])
     batch_size=32
@@ -91,7 +92,7 @@ def main():
     model = DQN(MlpPolicy, env, verbose=1, tensorboard_log=r"D:\all projects\stock-traiding\tensor_log")
     # path=r"D:\all projects\stock-traiding\models\9990000.zip"
     # model = DQN.load(path,env=env)
-    TIMESTEPS = 1000000
+    TIMESTEPS = 10000000
     checkpoint_callback=CheckpointCallback(save_freq=1e4,save_path=models_dir)
     model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False,callback=[checkpoint_callback])
     epoches=0
