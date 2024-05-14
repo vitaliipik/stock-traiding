@@ -89,11 +89,14 @@ def main():
     # Initialize DQN model
     print("env creatre")
     train=True
-    model = DQN(MlpPolicy, env, verbose=1, tensorboard_log=r"D:\all projects\stock-traiding\tensor_log")
-    # path=r"D:\all projects\stock-traiding\models\9990000.zip"
+    model = DQN(MlpPolicy, env, verbose=1,
+                exploration_fraction=0.5,
+                exploration_final_eps=0.1,
+                tensorboard_log=r"D:\all projects\stock-traiding\tensor_log")
+    # path=r"D:\all projects\stock-traiding\models_backup\back_gum_0_18%\rl_model_10000000_steps.zip"
     # model = DQN.load(path,env=env)
     TIMESTEPS = 10000000
-    checkpoint_callback=CheckpointCallback(save_freq=1e4,save_path=models_dir)
+    checkpoint_callback=CheckpointCallback(save_freq=1e5,save_path=models_dir)
     model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False,callback=[checkpoint_callback])
     epoches=0
     epoches_end=1000
